@@ -75,6 +75,6 @@ const UserSchema: Schema<User> = new mongoose.Schema({
 // If the 'User' model (of type <User>) already exist, you can access it using mongoose.models.User instead of creating a new model.
 
 // mongoose.model<User>('User', UserSchema): it creates a Mongoose model named 'User'( of type <User>) based on the UserSchema schema definition, and assigns the resulting model to the userModel variable.
-const UserModel = (mongoose.models.User as mongoose.Model<User>) || mongoose.model<User>('User', UserSchema);
+const User = (mongoose.models.User as mongoose.Model<User>) || mongoose.model<User>('User', UserSchema);
 
-export default UserModel;
+export default User;
