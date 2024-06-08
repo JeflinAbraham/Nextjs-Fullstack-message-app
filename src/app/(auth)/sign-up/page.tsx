@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useDebounceValue } from 'usehooks-ts';
 
 
 import Link from 'next/link';
@@ -27,6 +26,7 @@ import {
 import { Input } from '@/components/ui/input';
 
 
+import { useDebounceCallback } from 'usehooks-ts';
 import { useToast } from '@/components/ui/use-toast';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
@@ -34,28 +34,32 @@ import { Loader2 } from 'lucide-react';
 
 
 export default function SignUpForm() {
-
+    
     const [username, setUsername] = useState('');
     const [usernameMessage, setUsernameMessage] = useState('');
     // loading states
     const [isCheckingUsername, setIsCheckingUsername] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     /*
-    debouncing:
-    The useDebounceValue takes two parameters: the value to be debounced (in this case, the username state variable) and the debounce delay (300 milliseconds). debouncedUsername is set/updated only after the user has stopped typing for the specified debounce delay (300 milliseconds)
+    debouncing: Debouncing is a technique used to limit the rate at which a function is executed. Here, debouncing is used to delay the API call to check-unique-username, username is updated only when the user has stopped typing for a specified period (300ms). This prevents excessive API calls and enhances performance.
+
+    useDebounceCallback parameters: (function to debounce, delay)
     */
-    const debouncedUsername = useDebounceValue(username, 300);
-    useEffect(() => {
-        const checkUsernameUnique = async () => {
-            if (debouncedUsername) {
+   const debounced = useDebounceCallback(setUsername, 300);
+   useEffect(() => {
+       const checkUsernameUnique = async () => {
+            if (username) {
                 setIsCheckingUsername(true);
                 setUsernameMessage('');
                 try {
-                    const response = await axios.get(`/api/check-username-unique?username=${debouncedUsername}`);
+                    const response = await axios.get(`/api/check-username-unique?username=${username}`);
                     console.log(response);
 
+                    
                     // in axios, use response.data to access the json response returned by the server.
-                    if (response) setUsernameMessage(response.data.message);
+                    if (response){
+                        setUsernameMessage(response.data.message);
+                    }
                 }
                 catch (error: any) {
                     setUsernameMessage(error.response.data.message);
@@ -67,7 +71,7 @@ export default function SignUpForm() {
         };
         checkUsernameUnique();
 
-    }, [debouncedUsername]);
+    }, [username]);
 
 
 
@@ -97,17 +101,12 @@ export default function SignUpForm() {
     const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
         setIsSubmitting(true);
         try {
-            const response = await axios.post('/api/sign-up', data);
-            // shadcn docs for toast
-            toast({
-                title: 'Success',
-                description: response.data.message,
-            });
+            const response = await axios.post('/api/signup', data);
             router.replace(`/verify/${username}`);
         }
         catch (error: any) {
             toast({
-                title: 'Sign Up Failed',
+                title: 'Sign Up Faileddddd',
                 description: error.response.data.message,
                 variant: 'destructive',
             });
@@ -121,15 +120,15 @@ export default function SignUpForm() {
         <div className="flex justify-center items-center min-h-screen bg-gray-800">
             <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
                 <div className="text-center">
-                    <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
+                    <h1 className="text-4xl font-extrabold lg:text-5xl mb-6">
                         Join True Feedback
                     </h1>
-                    <p className="mb-4">Sign up to start your anonymous adventure</p>
+                    <p className="mb-4 italic">Sign up to start your anonymous adventure</p>
                 </div>
 
 
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <FormField
                             name="username"
                             control={form.control}
@@ -137,18 +136,19 @@ export default function SignUpForm() {
                                 <FormItem>
                                     <FormLabel>Username</FormLabel>
                                     {/* we need the value of input field to be stored in the username state for debouncing */}
-                                    <Input {...field}
+                                    <Input placeholder='Username' {...field}
                                         onChange={(e) => {
                                             // // Ensure internal form state is updated.
                                             field.onChange(e);
 
                                             // Custom handler logic
-                                            setUsername(e.target.value);
+                                            debounced(e.target.value);
                                         }}
+
                                     />
                                     {isCheckingUsername && <Loader2 className="animate-spin" />}
                                     {!isCheckingUsername && usernameMessage && (
-                                        <p className={`text-sm ${usernameMessage === 'Username is unique' ? 'text-green-500' : 'text-red-500'}`}
+                                        <p className={`text-sm ${usernameMessage === 'Username is unique' ? 'text-green-600' : 'text-red-600'}`}
                                         >
                                             {usernameMessage}
                                         </p>
@@ -174,7 +174,7 @@ export default function SignUpForm() {
 
                                     When the user submits the form or the input loses focus (triggering onBlur), React Hook Form validates the input value against the Zod schema. If validation fails, the error message is displayed via the FormMessage component.
                                     */}
-                                    <Input {...field} />
+                                    <Input {...field} placeholder='Email'/>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -186,7 +186,7 @@ export default function SignUpForm() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Password</FormLabel>
-                                    <Input {...field} type='password' />
+                                    <Input {...field} type='password' placeholder='Password'/>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -206,7 +206,7 @@ export default function SignUpForm() {
                 <div className="text-center mt-4">
                     <p>
                         Already a member?{' '}
-                        <Link href="/sign-in" className="text-blue-600 hover:text-blue-800">
+                        <Link href="/sign-in" className="text-blue-600 underline hover:text-blue-800">
                             Sign in
                         </Link>
                     </p>
