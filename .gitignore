@@ -1,5 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
+package-lock.json
 # dependencies
 /node_modules
 /.pnp
@@ -34,3 +34,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+package-lock.json
+.env
+package-lock.json
+package.json
+package-lock.json
+package.json
+package.json
+package-lock.json
+src/components/ui/button.tsx
+src/components/ui/form.tsx
+src/components/ui/input.tsx
+src/components/ui/label.tsx
+src/components/ui/toast.tsx
+src/components/ui/toaster.tsx
+src/components/ui/use-toast.ts
+package-lock.json
+package.json

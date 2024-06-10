@@ -116,7 +116,7 @@ export const authOptions: NextAuthOptions = {
     newUser: /api/auth/new-user
     */
 
-    // This allows you to have a custom sign-in page in your Next.js application, rather than using the default sign-in page provided by NextAuth.js.
+    // When users need to sign in, they will be redirected to /sign-in instead of the default NextAuth.js sign-in page.
     pages: {
         signIn: '/sign-in',
     },

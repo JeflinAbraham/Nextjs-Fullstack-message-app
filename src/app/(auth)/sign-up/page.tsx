@@ -102,6 +102,12 @@ export default function SignUpForm() {
         setIsSubmitting(true);
         try {
             const response = await axios.post('/api/signup', data);
+            if(response?.data.succcess){
+                toast({
+                    title: 'Sign Up successful',
+                    description: response.data.message
+                });
+            }
             router.replace(`/verify/${username}`);
         }
         catch (error: any) {
@@ -120,15 +126,15 @@ export default function SignUpForm() {
         <div className="flex justify-center items-center min-h-screen bg-gray-800">
             <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
                 <div className="text-center">
-                    <h1 className="text-4xl font-extrabold lg:text-5xl mb-6">
+                    <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
                         Join True Feedback
                     </h1>
-                    <p className="mb-4 italic">Sign up to start your anonymous adventure</p>
+                    <p className="mb-4">Sign up to start your anonymous adventure</p>
                 </div>
 
 
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         <FormField
                             name="username"
                             control={form.control}
